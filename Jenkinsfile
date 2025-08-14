@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "pavanreddy56/hello-java:latest"
+        DOCKER_IMAGE = "pavanreddych/hello-java:latest"
     }
 
     stages {
