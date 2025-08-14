@@ -33,6 +33,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
+                bat 'dir target'  // ✅ Verify JAR exists
                 bat 'docker build -t %DOCKER_IMAGE% .'
             }
         }
