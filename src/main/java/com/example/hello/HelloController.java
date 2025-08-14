@@ -6,8 +6,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloController {
 
-    @GetMapping("/play")
-    public String playGame() {
-        return "Welcome to the Big Java Game! Let's start your adventure.";
+    @GetMapping("/")
+    public String home() {
+        return "Welcome to My Java Game!";
+    }
+
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello Player!";
     }
 }
