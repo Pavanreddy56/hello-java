@@ -42,7 +42,7 @@ pipeline {
 
         stage('Deploy to Minikube') {
             steps {
-                bat 'kubectl apply -f k8s-deployment.yaml'
+                bat 'kubectl apply -f deployment.yaml'
                 bat 'kubectl get pods'
                 bat 'kubectl get svc'
             }
