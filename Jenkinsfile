@@ -19,16 +19,20 @@ pipeline {
 
         stage('Build with Maven') {
             steps {
-                dir("${WORKSPACE}") {
-                    bat 'mvn clean package -DskipTests'
-                }
+                bat 'mvn clean package -DskipTests'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                dir("${WORKSPACE}") {
-                    bat 'docker build -t %DOCKER_IMAGE% .'
+                bat 'docker build -t %DOCKER_IMAGE% .'
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    bat 'docker login -u %DOCKER_USER% -p %DOCKER_PASS%'
                 }
             }
         }
@@ -40,6 +44,7 @@ pipeline {
         }
     }
 }
+
 
 
 
