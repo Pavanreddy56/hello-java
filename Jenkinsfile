@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven3'
-        jdk 'JDK17'
+        maven 'Maven3'   // Your configured Maven in Jenkins
+        jdk 'JDK17'      // Your configured JDK in Jenkins
     }
 
     environment {
@@ -20,7 +20,15 @@ pipeline {
         stage('Build with Maven') {
             steps {
                 bat 'mvn clean package -DskipTests'
-                bat 'dir target'  // ✅ Check if jar exists
+                bat 'dir target'  // ✅ Verify jar exists
+            }
+        }
+
+        stage('Prepare Docker Context') {
+            steps {
+                // Copy jar from target/ to workspace root for Docker build context
+                bat 'copy target\\*.jar .'
+                bat 'dir' // ✅ List files in workspace to confirm jar is here
             }
         }
 
@@ -34,10 +42,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                // ✅ Ensure we are in the workspace folder containing target/
-                dir("${WORKSPACE}") {
-                    bat 'docker build -t %DOCKER_IMAGE% .'
-                }
+                bat 'docker build -t %DOCKER_IMAGE% .'
             }
         }
 
@@ -48,5 +53,4 @@ pipeline {
         }
     }
 }
-
 
