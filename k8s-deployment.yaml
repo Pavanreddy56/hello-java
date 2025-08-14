@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: hello-java
-        image: hello-java:latest
+        image: hello-javaa:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
