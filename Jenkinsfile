@@ -7,8 +7,7 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = "pavanreddy56/hello-java"
-        IMAGE_TAG = "latest"
+        DOCKER_IMAGE = "pavanreddy56/hello-java:latest"
     }
 
     stages {
@@ -20,26 +19,23 @@ pipeline {
 
         stage('Build with Maven') {
             steps {
-                bat 'mvn clean package -DskipTests'
-                bat 'dir target'  // Verify jar is created
+                dir("${WORKSPACE}") {
+                    bat 'mvn clean package -DskipTests'
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t %IMAGE_NAME%:%IMAGE_TAG% .'
-                bat 'docker images' // Check image exists
+                dir("${WORKSPACE}") {
+                    bat 'docker build -t %DOCKER_IMAGE% .'
+                }
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    bat """
-                        echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin
-                        docker push %IMAGE_NAME%:%IMAGE_TAG%
-                    """
-                }
+                bat 'docker push %DOCKER_IMAGE%'
             }
         }
     }
