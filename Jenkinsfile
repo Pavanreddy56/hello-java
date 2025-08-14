@@ -7,8 +7,8 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "hello-java:latest"
-        DEPLOYMENT_NAME = "hello-java-deployment"
+        IMAGE_NAME = "pavanreddy56/hello-java"
+        IMAGE_TAG = "latest"
     }
 
     stages {
@@ -24,24 +24,18 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build & Push Docker Image') {
             steps {
-                bat 'docker build -t %DOCKER_IMAGE% .'
-            }
-        }
-
-        stage('Load Image into Minikube') {
-            steps {
-                bat 'minikube image load %DOCKER_IMAGE%'
-            }
-        }
-
-        stage('Deploy to Minikube') {
-            steps {
-                bat 'kubectl apply -f k8s/deployment.yaml'
-                bat 'kubectl apply -f k8s/service.yaml'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    bat """
+                        docker build -t %IMAGE_NAME%:%IMAGE_TAG% .
+                        echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin
+                        docker push %IMAGE_NAME%:%IMAGE_TAG%
+                    """
+                }
             }
         }
     }
 }
+
 
