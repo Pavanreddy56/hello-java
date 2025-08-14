@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = "hello-java:latest"
+        DOCKER_IMAGE = "hello-javaa:latest"
         DOCKER_HOST = "tcp://127.0.0.1:62131"
         DOCKER_TLS_VERIFY = "1"
         DOCKER_CERT_PATH = "C:\\Users\\cheed\\.minikube\\certs"
