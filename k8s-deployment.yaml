@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: hello-java-deployment
 spec:
-  replicas: 1
+  replicas: 10
   selector:
     matchLabels:
       app: hello-java
