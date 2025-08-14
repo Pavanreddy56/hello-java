@@ -20,6 +20,7 @@ pipeline {
         stage('Build with Maven') {
             steps {
                 bat 'mvn clean package -DskipTests'
+                bat 'dir target'  // ✅ Check if jar exists
             }
         }
 
@@ -33,8 +34,10 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'dir target'  // ✅ Verify JAR exists
-                bat 'docker build -t %DOCKER_IMAGE% .'
+                // ✅ Ensure we are in the workspace folder containing target/
+                dir("${WORKSPACE}") {
+                    bat 'docker build -t %DOCKER_IMAGE% .'
+                }
             }
         }
 
@@ -45,4 +48,5 @@ pipeline {
         }
     }
 }
+
 
