@@ -1,54 +1,47 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    IMAGE = "pavanreddy-hello:${env.BUILD_NUMBER}"
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
+    tools {
+        maven 'Maven3'
+        jdk 'JDK21'
     }
 
-    stage('Build (Maven)') {
-      steps {
-        bat 'mvn -B -DskipTests clean package'
-      }
+    environment {
+        DOCKER_IMAGE = "hello-java:latest"
+        DEPLOYMENT_NAME = "hello-java-deployment"
     }
 
-    stage('Build Docker Image') {
-      steps {
-        bat "docker build -t ${IMAGE} ."
-      }
-    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git'
+            }
+        }
 
-    stage('Load image into Minikube') {
-      steps {
-        bat "minikube image load ${IMAGE}"
-      }
-    }
+        stage('Build with Maven') {
+            steps {
+                bat 'mvn clean package -DskipTests'
+            }
+        }
 
-    stage('Deploy to Kubernetes') {
-      steps {
-        bat """
-        kubectl apply -f k8s/
-        kubectl set image deployment/hello-deployment hello=${IMAGE} --record
-        """
-      }
-    }
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t %DOCKER_IMAGE% .'
+            }
+        }
 
-    stage('Smoke test (print service URL)') {
-      steps {
-        bat 'minikube service hello-service --url'
-      }
-    }
-  }
+        stage('Load Image into Minikube') {
+            steps {
+                bat 'minikube image load %DOCKER_IMAGE%'
+            }
+        }
 
-  post {
-    always {
-      echo "Pipeline finished"
+        stage('Deploy to Minikube') {
+            steps {
+                bat 'kubectl apply -f k8s/deployment.yaml'
+                bat 'kubectl apply -f k8s/service.yaml'
+            }
+        }
     }
-  }
 }
+
